@@ -90,20 +90,31 @@ for i=1:24
     x = ceil(i/ff);
     image('XData',x+.9*[-aw aw],'Ydata',y+.9*[-aw aw],'CData',(ims{i}),'AlphaData',(alpha{i}))
 end
+co = viridis(4);
 cnm={'birds','dogs','fish','boats','cars','planes'};
 for i=1:6
-    text(i,.3,cnm{i},'HorizontalAlignment','center','FontSize',20)
+    text(i,.3,cnm{i},'HorizontalAlignment','center','FontSize',20,'Color',co(2,:))
 end
 cnm={'animals','vehicles'};
 for i=1:2
-    text(2+3*(i-1),0,cnm{i},'HorizontalAlignment','center','FontSize',20)
+    text(2+3*(i-1),0,cnm{i},'HorizontalAlignment','center','FontSize',20,'Color',co(1,:))
 end
 
+cnm={'animacy','object','image'};
+for i=1:3
+    text(-.23,-.3+.3*i,cnm{i},'HorizontalAlignment','right','FontSize',20,'Color',co(i,:))
+end
 
+annotation('arrow','Units','pixels','Position',[140 747 60 0],'Color',co(1,:));
+annotation('arrow','Units','pixels','Position',[140 718 60 0],'Color',co(2,:));
+annotation('arrow','Units','pixels','Position',[140 685 60 -30],'Color',co(3,:));
+annotation('arrow','Units','pixels','Position',[140 685 60 -80],'Color',co(3,:));
+annotation('arrow','Units','pixels','Position',[140 685 60 -190],'Color',co(3,:));
 
 t=annotation('textbox','Units','pixels','Position',[1 725 50 50],'String','A','FontSize',40,'LineStyle','none');
 t=annotation('textbox','Units','pixels','Position',[1 250 50 50],'String','B','FontSize',40,'LineStyle','none');
 
+%%
 fn = 'figures/figure_design';
 print(gcf,'-dpng','-r500',fn)
 im=imread([fn '.png']);

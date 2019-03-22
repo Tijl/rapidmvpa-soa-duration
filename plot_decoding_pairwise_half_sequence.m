@@ -11,7 +11,7 @@ lh = .003; %spacing between dot lines
 li = -.012; %spacing between triplets
 ms = 2; %dot size
 zc = .9*[1 1 1]; %empty space bf colour
-catnames = {'Animacy','Category','Image'};
+catnames = {'Animacy','Object','Image'};
 for level = 1:3
     
     bn = {'200ms','100ms','50ms'};
@@ -29,6 +29,15 @@ for level = 1:3
         plot(timevect,.5+0*timevect,'k--')
         title(ttext{plotnr})
         h=[];
+        
+        if plotnr==1
+            %connecting lines
+            for z=-1:2
+                i=3;
+                plot([-190 min(timevect)],[.435+z*.015 (st+lh*z+li*(i-1))],'-o','Color',zc.*.9,'LineWidth',ms,'Clipping','off','MarkerSize',ms,'MarkerFaceColor',zc*.9);
+            end
+        end
+        
         for i=1:3
             ii=idx(plotnr,i);
             mu = MU{level,ii};
@@ -36,8 +45,7 @@ for level = 1:3
             bf = (BF{level,ii});
             fill([timevect,fliplr(timevect)],[mu-se fliplr(mu+se)],co(ii,:),'FaceAlpha',.2,'EdgeAlpha',0)
             h(i)=plot(timevect,mu,'-','Color',co(ii,:),'LineWidth',1,...
-                'DisplayName',...
-                [sprintf('%s: %ims',dt{3-plotnr},1000*dn{3-plotnr}(ii)),...
+                'DisplayName',[sprintf('%s: %ims',dt{3-plotnr},1000*dn{3-plotnr}(ii)),...
                 ' & ' sprintf('%s: %ims',dt{plotnr},1000*dn{plotnr}(ii))]);
 
             x = zeros(size(bf));
@@ -79,34 +87,64 @@ for level = 1:3
         xlabel('time (ms)')
         ylabel('accuracy')
         a.YLabel.Position = [-187 mean(a.YTick) -1];
+        
+        if plotnr==1
+            % bf box
+            a2 = axes('Position',[a.Position(1)-.095 a.Position(2) .07 .09],'box','on');
+            %leg.Position = a2.Position+[0 a2.Position(4) 0 -.12];
+            a2.XTick=[];a2.YTick=[];
+            a2.YLim=[.05 1.1];a2.XLim=[0 1];hold on
+            locs = linspace(0.1,.9,5);
+            mlocs = movmean(locs,2);mlocs = mlocs(2:end);
+            tt = fliplr({sprintf('BF>%i',bfthresh),'BF>1','BF<1',sprintf('BF<1/%i',bfthresh)});
+            bfc = co(3,:);
+            for y=1:length(locs)
+                if y==3
+                    plot([0.05 .95],locs(y)*[1 1],'-.','Color',bfc,'LineWidth',.8)
+                else
+                    plot([0.05 .95],locs(y)*[1 1],'Color',bfc,'LineWidth',.8)
+                end
+                if y<5
+                    if ismember(y,[2 3])
+                        plot(.2,mlocs(y),'o','Color',bfc,'MarkerSize',6)
+                    else
+                        plot(.2,mlocs(y),'o','Color',bfc,'MarkerSize',6,'MarkerFaceColor',bfc)
+                    end
+                    t=text(1/3,mlocs(y),tt{y},'Color',bfc,'FontSize',9);
+                    
+                end
+            end
+            t=text(.05,1,'Bayes Factor:','FontSize',10,'Color',bfc);
+        end
+        
     end
 end
 
 % bf box
-a2 = axes('Position',[.91 .84 .071 .1],'box','on');
-%leg.Position = a2.Position+[0 a2.Position(4) 0 -.12];
-a2.XTick=[];a2.YTick=[];
-a2.YLim=[.05 1.1];a2.XLim=[0 1];hold on
-locs = linspace(0.1,.9,5);
-mlocs = movmean(locs,2);mlocs = mlocs(2:end);
-tt = fliplr({sprintf('BF>%i',bfthresh),'BF>1','BF<1',sprintf('BF<1/%i',bfthresh)});
-bfc = 'k';
-for y=1:length(locs)
-    if y==3
-        plot([0.05 .95],locs(y)*[1 1],'-.','Color',bfc,'LineWidth',.8)
-    else
-        plot([0.05 .95],locs(y)*[1 1],'Color',bfc,'LineWidth',.8)
-    end
-    if y<5
-        if ismember(y,[2 3])
-            plot(.2,mlocs(y),'o','Color',bfc,'MarkerSize',6)
-        else
-            plot(.2,mlocs(y),'o','Color',bfc,'MarkerSize',6,'MarkerFaceColor',bfc)
-        end
-        t=text(1/3,mlocs(y),tt{y},'Color',bfc,'FontSize',9);
-    end
-    t=text(.1,1,'Bayes Factor:','FontSize',10);
-end
+% a2 = axes('Position',[.91 .84 .071 .1],'box','on');
+% %leg.Position = a2.Position+[0 a2.Position(4) 0 -.12];
+% a2.XTick=[];a2.YTick=[];
+% a2.YLim=[.05 1.1];a2.XLim=[0 1];hold on
+% locs = linspace(0.1,.9,5);
+% mlocs = movmean(locs,2);mlocs = mlocs(2:end);
+% tt = fliplr({sprintf('BF>%i',bfthresh),'BF>1','BF<1',sprintf('BF<1/%i',bfthresh)});
+% bfc = 'k';
+% for y=1:length(locs)
+%     if y==3
+%         plot([0.05 .95],locs(y)*[1 1],'-.','Color',bfc,'LineWidth',.8)
+%     else
+%         plot([0.05 .95],locs(y)*[1 1],'Color',bfc,'LineWidth',.8)
+%     end
+%     if y<5
+%         if ismember(y,[2 3])
+%             plot(.2,mlocs(y),'o','Color',bfc,'MarkerSize',6)
+%         else
+%             plot(.2,mlocs(y),'o','Color',bfc,'MarkerSize',6,'MarkerFaceColor',bfc)
+%         end
+%         t=text(1/3,mlocs(y),tt{y},'Color',bfc,'FontSize',9);
+%     end
+%     t=text(.1,1,'Bayes Factor:','FontSize',10);
+% end
 
 %%
 fn = 'figures/figure_decoding_pairwise_half_sequence';

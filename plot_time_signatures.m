@@ -15,12 +15,14 @@ end
 %% fancy plot including distributions
 load('results/stats_decoding_pairwise_half_sequence.mat')
 
-f=figure(1);clf;f.Position=[1 100 1000 600];f.Resize='off';f.PaperPositionMode='auto';
+f=figure(1);clf;f.Position=[1 100 800 800];f.Resize='off';f.PaperPositionMode='auto';
 drawnow
+
+fa = .5; %facealpha
 
 % onsets
 bfthresh=6;
-catnames = {'animacy','category','image'};
+catnames = {'animacy','object','image'};
 onset=[];onset_ci=[];offset=[];offset_ci=[];peak=[];peak_ci=[];
 for level = 1:3
     for condi=1:5
@@ -59,26 +61,26 @@ aw=.05;
 mw = 5;
 mscale = 15;
 for level=1:3
-    a=subplot(2,3,level);hold on
+    a=subplot(3,2,2*level-1);hold on
     title(sprintf('decoding window - %s',catnames{level}))
     lb=[];
     for condi=1:5
         y = 6-condi;
         x = squeeze(onset_ci(level,condi,:));
-        fill([timevect fliplr(timevect)],y+aw+mscale*[movmean(x,mw)' 0 0*timevect],co(condi,:),'FaceAlpha',.2,'EdgeAlpha',0);hold on
+        fill([timevect fliplr(timevect)],y+aw+mscale*[movmean(x,mw)' 0 0*timevect],co(condi,:),'FaceAlpha',fa,'EdgeAlpha',0);hold on
         x = squeeze(offset_ci(level,condi,:));
-        fill([timevect fliplr(timevect)],y-aw-mscale*[movmean(x,mw)' 0 0*timevect],co(condi,:),'FaceAlpha',.2,'EdgeAlpha',0);hold on
+        fill([timevect fliplr(timevect)],y-aw-mscale*[movmean(x,mw)' 0 0*timevect],co(condi,:),'FaceAlpha',fa,'EdgeAlpha',0);hold on
         x = [onset(level,condi) offset(level,condi)];
         fill([x fliplr(x)],y+[-aw -aw aw aw],co(condi,:),'EdgeAlpha',0);hold on
         lb{condi} = sprintf('duration: %i SOA: %i',1000*conditions.durationSTIM(condi),1000*conditions.durationISI(condi));
         text(x(1),y,sprintf('%ims',x(1)),'VerticalAlignment','top','HorizontalAlignment','right','FontSize',9,'Color',co(condi,:))
         text(x(2),y,sprintf('%ims',x(2)),'VerticalAlignment','bottom','HorizontalAlignment','left','FontSize',9,'Color',co(condi,:))
     end
-    xlabel('time')
-    a.YTick=1:5;
-    a.YLim=[0.5 5.5];
+    xlabel('time (ms)')
+    a.YLim=[0 6];
     a.XLim=[-100 1000];
     a.XTick=0:200:1000;
+    a.YTick=1:5;
     a.YTickLabel=fliplr(lb);
 end
 
@@ -88,24 +90,23 @@ co = viridis(6);
 co2 = plasma(4);
 aw=.2;
 for level=1:3
-    a=subplot(2,3,3+level);hold on
+    a=subplot(3,2,2*level);hold on
     title(sprintf('peak latency - %s',catnames{level}))
     lb=[];
     for condi=1:5
         y = 6-condi;
         x = squeeze(peak_ci(level,condi,:))';
-        fill([timevect fliplr(timevect)],y+mscale*[movmean(x,mw) 0 0*timevect],co(condi,:),'FaceAlpha',.2,'EdgeAlpha',0);hold on
+        fill([timevect fliplr(timevect)],y+mscale*[movmean(x,mw) 0 0*timevect],co(condi,:),'FaceAlpha',fa,'EdgeAlpha',0);hold on
         x = peak(level,condi);
         plot(x,y,'.','Color',co(condi,:),'MarkerSize',10);hold on
         lb{condi} = sprintf('duration: %i SOA: %i',1000*conditions.durationSTIM(condi),1000*conditions.durationISI(condi));
         text(x,y,sprintf('%ims',x),'VerticalAlignment','top','HorizontalAlignment','center','FontSize',9,'Color',co(condi,:))
     end
     xlabel('time (ms)')
-    a.YTick=1:5;
     a.XLim=[-100 1000];
     a.XTick=0:200:1000;
-    a.YTickLabel=fliplr(lb);
-    a.YLim=[0.5 5.5];
+    a.YTick=[1:5];a.YTickLabel=[];
+    a.YLim=[0 6];
 end
 
 fn = 'figures/figure_time_signatures_distributions';
